@@ -1,21 +1,20 @@
 $(document).ready(() => {
   var rawText;
 
+  var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+
+  const recognition = new SpeechRecognition();
+  const synth = window.speechSynthesis;
+  recognition.lang = "vi-VI";
+  recognition.continuous = false;
+
+  let mediaRecorder,
+  chunks = [],
+  audioURL = "";
+
   //Audio
 
-  const displayMess = document.querySelector("#message-board");
-  const State = ["Initial", "Record", "Download"];
-  let stateIndex = 0;
-  let mediaRecorder,
-    chunks = [],
-    audioURL = "";
-  let botTypingHtml =
-    '<p id="botTypingHtml" class="post post-bot"><img src="/static/hp.png" class="rounded-circle shadow-4" style="width: 40px; margin-right: 10px" alt="Avatar"/><span><img src="/static/typingnow.gif" style="height: 60px"/></span></p>';
-
-  // mediaRecorder setup for audio
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    console.log("mediaDevices supported..");
-
     navigator.mediaDevices
       .getUserMedia({
         audio: true,
@@ -25,8 +24,8 @@ $(document).ready(() => {
 
         mediaRecorder.ondataavailable = (e) => {
           chunks.push(e.data);
+          console.log(e)
         };
-
         mediaRecorder.onstop = () => {
           const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
           chunks = [];
@@ -37,30 +36,46 @@ $(document).ready(() => {
       .catch((error) => {
         console.log("Following error has occured : ", error);
       });
-  } else {
-    stateIndex = "";
-    application(stateIndex);
-  }
+  } 
+
+  const displayMess = document.querySelector("#message-board");
+
+  let botTypingHtml =
+    '<p id="botTypingHtml" class="post post-bot"><img src="/static/hp.png" class="rounded-circle shadow-4" style="width: 40px; margin-right: 10px" alt="Avatar"/><span><img src="/static/typingnow.gif" style="height: 60px"/></span></p>';
 
   $("#recButton").addClass("notRec");
 
   $("#recButton").click(function () {
     if ($(".pause-button").hasClass("class-hidden")) {
       $(".pause-button").removeClass("class-hidden");
+      recognition.start();
       mediaRecorder.start();
     }
   });
 
-  $(".pause-button").click(function () {
-    $(".pause-button").addClass("class-hidden");
+  recognition.onspeechend = () => {
+    recognition.stop();
     mediaRecorder.stop();
+  };
+
+  recognition.onerror = (err) => {
+    console.error(err);
+  };
+
+  recognition.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+
+    $(".pause-button").addClass("class-hidden");
+    
     const audio = document.createElement("audio");
     audio.controls = true;
     audio.src = audioURL;
     audio.className = "post post-user";
     displayMess.append(audio);
     $scrollDown();
-  });
+
+    console.log(text)
+  };
 
   //End Audio
 
