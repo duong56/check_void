@@ -1,7 +1,6 @@
 from tokenization.crf_tokenizer import CrfTokenizer
 from word_embedding.word2vec_gensim import Word2Vec
 from text_classification.short_text_classifiers import BiDirectionalLSTMClassifier, load_synonym_dict
-import os
 
 # Please give the correct paths
 # Load word2vec model from file.
@@ -26,6 +25,6 @@ X, y = keras_text_classifier.load_data(['data/sentiment/samples/positive.txt',
 # Train your classifier and test the model
 keras_text_classifier.train(X, y)
 label_dict = {0: 'tích cực', 1: 'tiêu cực'}
-test_sentences = ['Mon hoc nay hay']
+test_sentences = ['Môn học này quá khó']
 labels = keras_text_classifier.classify(test_sentences, label_dict=label_dict)
 print(labels)

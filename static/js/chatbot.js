@@ -1,5 +1,5 @@
 $(document).ready(() => {
-  var rawText;
+  var text;
 
   var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
 
@@ -63,7 +63,9 @@ $(document).ready(() => {
   };
 
   recognition.onresult = (e) => {
-    const text = e.results[0][0].transcript;
+    text = e.results[0][0].transcript;
+
+    console.log(text)
 
     $(".pause-button").addClass("class-hidden");
     
@@ -74,7 +76,7 @@ $(document).ready(() => {
     displayMess.append(audio);
     $scrollDown();
 
-    console.log(text)
+    setTimeout(botTyping, 720);
   };
 
   //End Audio
@@ -85,30 +87,27 @@ $(document).ready(() => {
   }
 
   function getBotResponse() {
-    $.get("/get", { msg: rawText }).done(function (data) {
+    $.get("/get", { msg: text }).done(function (data) {
       var botHtml =
-        '<p class="botText post post-bot"><img src="/static/hp.png" width="64" height="64" align="left" style="margin: 3px;"><span>' +
+        '<p class="post post-bot"><img src="/static/hp.png" width="64" height="64" align="left" style="margin: 3px;">' +
         data +
-        "</span></p>";
-      document.getElementById("typing").style.visibility = "hidden";
+        "</p>";
+        $("#botTypingHtml").remove();
       $("#message-board").append(botHtml);
-      document
-        .getElementById("userInput")
-        .scrollIntoView({ block: "start", behavior: "smooth" });
     });
   }
   $("#message").keypress(function (e) {
     if (e.which == 13) {
-      rawText = $("#message").val();
+      text = $("#message").val();
       $("#message").val("");
-      var userHtml = '<p class="userText"><span>' + rawText + "</span></p>";
+      var userHtml = '<p class="userText"><span>' + text + "</span></p>";
       $("#message-board").append(userHtml);
       setTimeout(botTyping, 750);
     }
   });
 
   function botTyping() {
-    document.getElementById("typing").style.visibility = "visible";
+    $("#message-board").append(botTypingHtml);
     getBotResponse();
   }
 
@@ -154,8 +153,8 @@ $(document).ready(() => {
   function postBotWelcome() {
     $("#message-board").append(botTypingHtml);
     setTimeout(() => {
-      const html = `<div class="post post-bot">Welcome to my app !!!</div>`;
-      const htmlQuestion = `<div class="post post-bot">How do you feel about Math?</div>`;
+      const html = `<div class="post post-bot">Chào mừng tới ứng dụng !!!</div>`;
+      const htmlQuestion = `<div class="post post-bot">Bạn nghĩ sao về môn triết học</div>`;
       $("#botTypingHtml").remove();
       $("#message-board").append(html);
       $("#message-board").append(htmlQuestion);
@@ -163,4 +162,5 @@ $(document).ready(() => {
     }, 1000);
   }
   postBotWelcome();
+
 });
