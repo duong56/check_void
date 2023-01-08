@@ -2,6 +2,13 @@ $(document).ready(() => {
   var text;
 
   var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+  var question = [
+    "Câu 1: Về nội dung, cấu trúc của học phần: (độ khó; sự cần thiết; phân phối thời gian , …)",
+    "Câu 2: Về giáo trình, tài liệu phục vụ học phần (có đầy đủ, rõ ràng, phù hợp không; có dễ dàng tìm thấy trong thư viện hoặc từ nguồn khác không; có kịp thời cho việc chuẩn bị, ôn tập không,...)",
+    "Câu 3: Về hoạt động giảng dạy của giảng viên (sự hấp dẫn, rõ ràng trong truyền đạt; sự hợp lý, công bằng trong kiểm tra, đánh giá; sự nhiệt tình và thân thiện; ưu điểm nổi bật của giảng viên,....)",
+    "Câu 4: Về cơ sở vật chất phục vụ dạy và học (điều kiện phòng học; chất lượng trang thiết bị trong phòng; hiệu quả đáp ứng của cán bộ phục vụ,…)",
+  ]
+  var count = 0
 
   const recognition = new SpeechRecognition();
   const synth = window.speechSynthesis;
@@ -77,6 +84,8 @@ $(document).ready(() => {
     $scrollDown();
 
     setTimeout(botTyping, 720);
+
+
   };
 
   //End Audio
@@ -94,6 +103,7 @@ $(document).ready(() => {
         "</p>";
         $("#botTypingHtml").remove();
       $("#message-board").append(botHtml);
+      botQuestion(count);
     });
   }
   $("#message").keypress(function (e) {
@@ -154,13 +164,28 @@ $(document).ready(() => {
     $("#message-board").append(botTypingHtml);
     setTimeout(() => {
       const html = `<div class="post post-bot">Chào mừng tới ứng dụng !!!</div>`;
-      const htmlQuestion = `<div class="post post-bot">Bạn nghĩ sao về môn triết học</div>`;
       $("#botTypingHtml").remove();
       $("#message-board").append(html);
-      $("#message-board").append(htmlQuestion);
+      botQuestion(count)
       $scrollDown();
     }, 1000);
   }
   postBotWelcome();
+
+  function botQuestion(index){
+    $("#message-board").append(botTypingHtml);
+    setTimeout(() => {
+      if(index <=5){
+        const htmlQuestion = `<div class="post post-bot">${question[index]}</div>`;
+        $("#message-board").append(htmlQuestion);
+        count++;
+      } else {
+        const htmlQuestion = `<div class="post post-bot">Kết Thúc ^^</div>`;
+        $("#message-board").append(htmlQuestion);
+      }
+      $("#botTypingHtml").remove();
+      $scrollDown();
+    }, 1000);
+  }
 
 });
